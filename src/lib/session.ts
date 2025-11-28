@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 
 import { eq } from "drizzle-orm";
-import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
+import type { NextRequest } from "next/server";
 
 import { db } from "@/db";
 import { sessionsTable, usersTable } from "@/db/schema";
@@ -82,4 +82,3 @@ export async function getSessionFromRequest(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   return getSessionByToken(token);
 }
-
