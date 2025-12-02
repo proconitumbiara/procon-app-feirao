@@ -7,24 +7,12 @@ import { db } from "@/db";
 import { sectorsTable, ticketsTable } from "@/db/schema";
 import { actionClient } from "@/lib/next-safe-action";
 import { sendToPanel } from "@/lib/panel-api";
-import { getSession } from "@/lib/session";
 
 import { CallNextSchema, ErrorMessages, ErrorTypes } from "./schema";
 
 export const callNextTicket = actionClient
   .schema(CallNextSchema)
   .action(async ({ parsedInput }) => {
-    const session = await getSession();
-
-    if (!session?.user) {
-      return {
-        error: {
-          type: ErrorTypes.UNAUTHENTICATED,
-          message: ErrorMessages[ErrorTypes.UNAUTHENTICATED],
-        },
-      };
-    }
-
     const sector = await db.query.sectorsTable.findFirst({
       where: eq(sectorsTable.id, parsedInput.sectorId),
     });

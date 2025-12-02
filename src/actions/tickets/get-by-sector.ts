@@ -6,7 +6,6 @@ import { z } from "zod";
 import { db } from "@/db";
 import { sectorsTable, ticketsTable } from "@/db/schema";
 import { actionClient } from "@/lib/next-safe-action";
-import { getSession } from "@/lib/session";
 
 const GetTicketsBySectorSchema = z.object({
   sectorId: z.string().uuid(),
@@ -15,16 +14,6 @@ const GetTicketsBySectorSchema = z.object({
 export const getTicketsBySector = actionClient
   .schema(GetTicketsBySectorSchema)
   .action(async ({ parsedInput }) => {
-    const session = await getSession();
-
-    if (!session?.user) {
-      return {
-        error: {
-          message: "Usuário não autenticado.",
-        },
-      };
-    }
-
     const sector = await db.query.sectorsTable.findFirst({
       where: eq(sectorsTable.id, parsedInput.sectorId),
     });
@@ -46,4 +35,3 @@ export const getTicketsBySector = actionClient
       tickets,
     };
   });
-
