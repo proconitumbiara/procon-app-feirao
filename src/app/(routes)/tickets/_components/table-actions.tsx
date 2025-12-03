@@ -52,10 +52,12 @@ const TableTicketActions = ({ ticket, sectors }: TableTicketActionsProps) => {
   );
 
   const isCanceled = ticket.status === "canceled";
+  const isCompleted = ticket.status === "completed";
+  const isDisabled = isCanceled || isCompleted;
   const isCanceling = cancelStatus === "executing";
 
   const handleCancelClick = () => {
-    if (isCanceled) return;
+    if (isDisabled) return;
     setCancelDialogIsOpen(true);
   };
 
@@ -90,12 +92,12 @@ const TableTicketActions = ({ ticket, sectors }: TableTicketActionsProps) => {
           variant="ghost"
           size="sm"
           onClick={handleCancelClick}
-          disabled={isCanceled || isCanceling}
+          disabled={isDisabled || isCanceling}
           aria-label={`Cancelar ticket ${ticket.costumer_name}`}
           className="hover:text-destructive cursor-pointer hover:bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
         >
           <XIcon className="h-4 w-4" />
-          {isCanceled ? "Cancelado" : "Cancelar"}
+          {isCanceled ? "Cancelado" : isCompleted ? "Concluído" : "Cancelar"}
         </Button>
         <AlertDialogContent>
           <AlertDialogHeader>

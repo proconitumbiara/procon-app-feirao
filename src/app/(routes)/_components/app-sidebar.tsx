@@ -94,7 +94,7 @@ export function AppSidebar() {
                           : "text-foreground group-hover/button:text-primary"
                       }`}
                     >
-                      Setores
+                      Serviços
                     </span>
                   </Link>
                 </SidebarMenuButton>

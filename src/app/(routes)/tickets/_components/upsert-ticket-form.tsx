@@ -254,14 +254,14 @@ const UpsertTicketForm = ({
               name="sectorId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Setor</FormLabel>
+                  <FormLabel>Serviço</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value || ""}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione um setor" />
+                        <SelectValue placeholder="Selecione um serviço" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
