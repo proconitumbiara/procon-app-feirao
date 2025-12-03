@@ -65,7 +65,7 @@ const LoginForm = () => {
       }
 
       toast.success("Login realizado com sucesso!");
-      router.push("/atendimento");
+      router.push("/tickets");
       router.refresh();
     } catch (error) {
       const message =

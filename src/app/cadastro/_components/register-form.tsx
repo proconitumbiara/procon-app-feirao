@@ -85,7 +85,7 @@ const RegisterForm = () => {
       }
 
       toast.success("Cadastro realizado com sucesso!");
-      router.push("/atendimento");
+      router.push("/tickets");
       router.refresh();
     } catch (error) {
       const message =
