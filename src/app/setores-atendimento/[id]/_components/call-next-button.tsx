@@ -4,7 +4,7 @@ import { Loader2, Megaphone } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import { callNextTicket } from "@/actions/call-next-costumer";
+import { callNextTicket } from "@/actions/call-next-ticket";
 import { Button } from "@/components/ui/button";
 
 type CallNextButtonProps = {

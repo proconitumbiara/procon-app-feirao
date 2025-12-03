@@ -65,8 +65,21 @@ export const ticketsTableColumns = (sectors: Sector[]): ColumnDef<Ticket>[] => [
     id: "sector",
     header: "Setor",
     cell: ({ row }) => {
-      const sector = sectors.find((s) => s.id === row.original.sectorId);
-      return sector?.name || "-";
+      const ticket = row.original;
+
+      // Se for Renegociação, mostrar "Renegociação"
+      if (ticket.service_type === "Renegociação") {
+        return "Renegociação";
+      }
+
+      // Se for Serviço, mostrar o nome do setor
+      if (ticket.service_type === "Serviço") {
+        const sector = sectors.find((s) => s.id === ticket.sectorId);
+        return sector?.name || "-";
+      }
+
+      // Fallback caso não tenha tipo definido
+      return "-";
     },
   },
   {

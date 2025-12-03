@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, LayoutDashboard } from "lucide-react";
+import { Building2, LayoutDashboard, TicketsIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,6 +19,7 @@ export function AppSidebar() {
   const pathname = usePathname();
   const isAtendimento = pathname === "/atendimento";
   const isSetores = pathname === "/setores";
+  const isTickets = pathname === "/tickets";
   const buttonBaseClasses =
     "group/button flex h-20 w-20 flex-col items-center justify-center gap-2 rounded-md border text-center transition-all hover:bg-transparent bg-transparent";
   const buttonActiveClasses = "border-primary text-primary";
@@ -94,6 +95,36 @@ export function AppSidebar() {
                       }`}
                     >
                       Setores
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+
+                <SidebarMenuButton
+                  asChild
+                  isActive={isTickets}
+                  className="bg-transparent hover:bg-transparent data-[active=true]:bg-transparent data-[state=open]:hover:bg-transparent"
+                >
+                  <Link
+                    href="/tickets"
+                    className={`${buttonBaseClasses} ${
+                      isTickets ? buttonActiveClasses : buttonInactiveClasses
+                    }`}
+                  >
+                    <TicketsIcon
+                      className={`h-5 w-5 transition ${
+                        isTickets
+                          ? "text-primary"
+                          : "text-foreground group-hover/button:text-primary"
+                      }`}
+                    />
+                    <span
+                      className={`text-xs font-semibold transition ${
+                        isTickets
+                          ? "text-primary"
+                          : "text-foreground group-hover/button:text-primary"
+                      }`}
+                    >
+                      Tickets
                     </span>
                   </Link>
                 </SidebarMenuButton>

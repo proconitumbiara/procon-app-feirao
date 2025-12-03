@@ -1,7 +1,5 @@
 "use server";
 
-import "@/ws-server";
-
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -9,8 +7,6 @@ import { db } from "@/db";
 import { ticketsTable } from "@/db/schema";
 import { actionClient } from "@/lib/next-safe-action";
 import { getSession } from "@/lib/session";
-// Importar ws-server para garantir inicialização do servidor WebSocket
-import { broadcastTicketUpdate } from "@/ws-server";
 
 import {
   CreateTicketSchema,
@@ -49,14 +45,22 @@ export const updateTicket = actionClient
     // Preparar dados para atualização
     const updateData: {
       costumer_name?: string;
-      sectorId?: string;
+      sectorId?: string | null;
+      service_type?: string;
     } = {};
 
     if (parsedInput.costumer_name !== undefined) {
       updateData.costumer_name = parsedInput.costumer_name;
     }
     if (parsedInput.sectorId !== undefined) {
-      updateData.sectorId = parsedInput.sectorId;
+      // Converter string vazia para null, caso contrário usar o valor
+      updateData.sectorId =
+        parsedInput.sectorId && parsedInput.sectorId.length > 0
+          ? parsedInput.sectorId
+          : null;
+    }
+    if (parsedInput.service_type !== undefined) {
+      updateData.service_type = parsedInput.service_type;
     }
 
     await db
@@ -65,12 +69,6 @@ export const updateTicket = actionClient
       .where(eq(ticketsTable.id, parsedInput.id));
 
     revalidatePath("/atendimento");
-
-    // Emitir evento WebSocket para atualização em tempo real
-    broadcastTicketUpdate({
-      type: "ticket-updated",
-      ticketId: parsedInput.id,
-    });
 
     return { data: { success: true } };
   });
@@ -94,17 +92,15 @@ export const createTicket = actionClient
       .values({
         costumer_name: parsedInput.costumer_name,
         status: "pending",
-        sectorId: parsedInput.sectorId,
+        sectorId:
+          parsedInput.sectorId && parsedInput.sectorId.length > 0
+            ? parsedInput.sectorId
+            : null, // Converter string vazia ou undefined para null
+        service_type: parsedInput.service_type,
       })
       .returning();
 
     revalidatePath("/atendimento");
-
-    // Emitir evento WebSocket para atualização em tempo real
-    broadcastTicketUpdate({
-      type: "ticket-created",
-      ticketId: newTicket.id,
-    });
 
     return { data: newTicket };
   });

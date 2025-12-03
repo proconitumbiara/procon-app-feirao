@@ -40,21 +40,22 @@ export const sectorsTable = pgTable("sectors", {
 export const ticketsTable = pgTable("tickets", {
   id: uuid("id").primaryKey().defaultRandom(),
   costumer_name: text("costumer_name").notNull(),
+  service_type: text("service_type").notNull(),
   status: text("status").notNull().default("pending"),
   calledAt: timestamp("called_at"),
   createdAT: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => new Date()),
-  sectorId: uuid("sector_id")
-    .notNull()
-    .references(() => sectorsTable.id, { onDelete: "cascade" }),
+  sectorId: uuid("sector_id").references(() => sectorsTable.id, {
+    onDelete: "cascade",
+  }),
 });
 
 export const operationsTable = pgTable("operations", {
   id: uuid("id").primaryKey().defaultRandom(),
   status: text("status").notNull().default("active"),
-  service_point: text("service_point").notNull(),
+  service_point: text("service_point"),
   createdAT: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

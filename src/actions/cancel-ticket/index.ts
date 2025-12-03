@@ -1,7 +1,5 @@
 "use server";
 
-import "@/ws-server";
-
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -9,13 +7,8 @@ import { db } from "@/db";
 import { ticketsTable } from "@/db/schema";
 import { actionClient } from "@/lib/next-safe-action";
 import { getSession } from "@/lib/session";
-import { broadcastTicketUpdate } from "@/ws-server";
 
-import {
-  CancelTicketSchema,
-  ErrorMessages,
-  ErrorTypes,
-} from "./schema";
+import { CancelTicketSchema, ErrorMessages, ErrorTypes } from "./schema";
 
 export const cancelTicket = actionClient
   .schema(CancelTicketSchema)
@@ -63,12 +56,5 @@ export const cancelTicket = actionClient
 
     revalidatePath("/atendimento");
 
-    // Emitir evento WebSocket para atualização em tempo real
-    broadcastTicketUpdate({
-      type: "ticket-updated",
-      ticketId: parsedInput.id,
-    });
-
     return { data: { success: true } };
   });
-

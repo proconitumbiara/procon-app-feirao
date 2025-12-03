@@ -3,6 +3,7 @@
 interface Cliente {
   name: string;
   sector: string;
+  service_point?: string;
 }
 
 /**
@@ -25,8 +26,13 @@ export async function sendToPanel(cliente: Cliente | Cliente[]) {
       ? cliente.map((c) => ({
           name: c.name,
           sector: c.sector,
+          ...(c.service_point && { service_point: c.service_point }),
         }))
-      : { name: cliente.name, sector: cliente.sector };
+      : {
+          name: cliente.name,
+          sector: cliente.sector,
+          ...(cliente.service_point && { service_point: cliente.service_point }),
+        };
 
     console.log("[WebSocket Server] Enviando para:", apiUrl);
     console.log(

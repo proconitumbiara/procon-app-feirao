@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/db";
@@ -12,14 +12,24 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Buscar parâmetro status da query string (opcional)
+  // Buscar parâmetros da query string (opcionais)
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
+  const serviceType = searchParams.get("service_type");
 
-  // Se status for fornecido, filtrar por status; caso contrário, retornar todos
-  const tickets = status
+  // Construir condições de filtro
+  const conditions = [];
+  if (status) {
+    conditions.push(eq(ticketsTable.status, status));
+  }
+  if (serviceType) {
+    conditions.push(eq(ticketsTable.service_type, serviceType));
+  }
+
+  // Aplicar filtros se houver condições
+  const tickets = conditions.length > 0
     ? await db.query.ticketsTable.findMany({
-        where: eq(ticketsTable.status, status),
+        where: conditions.length === 1 ? conditions[0] : and(...conditions),
       })
     : await db.query.ticketsTable.findMany();
 
