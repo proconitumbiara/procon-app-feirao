@@ -51,22 +51,31 @@ export const ticketsTable = pgTable("tickets", {
     .references(() => sectorsTable.id, { onDelete: "cascade" }),
 });
 
-//Tabela para armazenar logs
-export const logsTable = pgTable("logs", {
+export const operationsTable = pgTable("operations", {
   id: uuid("id").primaryKey().defaultRandom(),
-  description: text("description").notNull(),
-  type: text("type").notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  sectorId: uuid("sector_id").references(() => sectorsTable.id, {
-    onDelete: "cascade",
-  }),
-  ticketId: uuid("ticket_id").references(() => ticketsTable.id, {
-    onDelete: "cascade",
-  }),
+  status: text("status").notNull().default("active"),
+  service_point: text("service_point").notNull(),
   createdAT: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => new Date()),
+  //Relationships
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+});
+
+export const treatmentsTable = pgTable("treatments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  status: text("status").notNull().default("in_service"),
+  createdAT: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+  ticketId: uuid("ticket_id")
+    .notNull()
+    .references(() => ticketsTable.id, { onDelete: "cascade" }),
+  operationId: uuid("operation_id")
+    .notNull()
+    .references(() => operationsTable.id, { onDelete: "cascade" }),
 });
