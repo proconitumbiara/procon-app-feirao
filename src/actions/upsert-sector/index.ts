@@ -39,4 +39,5 @@ export const upsertSector = actionClient
     }
 
     revalidatePath("/setores");
+    revalidatePath("/setores-selecao");
   });
