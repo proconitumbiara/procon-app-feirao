@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { ticketsTable } from "@/db/schema";
 import { actionClient } from "@/lib/next-safe-action";
 import { getSession } from "@/lib/session";
+import { broadcastTicketUpdate } from "@/ws-server";
 
 import {
   CreateTicketSchema,
@@ -70,6 +71,20 @@ export const updateTicket = actionClient
 
     revalidatePath("/atendimento");
 
+    // Emitir evento de atualização via WebSocket (não bloqueia a operação em caso de erro)
+    try {
+      broadcastTicketUpdate({
+        type: "ticket-updated",
+        ticketId: parsedInput.id,
+      });
+    } catch (error) {
+      // Erro no WebSocket não deve impedir a atualização do ticket
+      console.error(
+        "[Ticket Update] Erro ao emitir evento WebSocket (ignorado):",
+        error,
+      );
+    }
+
     return { data: { success: true } };
   });
 
@@ -102,5 +117,19 @@ export const createTicket = actionClient
 
     revalidatePath("/atendimento");
 
-    return { data: newTicket };
+    // Emitir evento de criação via WebSocket (não bloqueia a operação em caso de erro)
+    try {
+      broadcastTicketUpdate({
+        type: "ticket-created",
+        ticketId: newTicket.id,
+      });
+    } catch (error) {
+      // Erro no WebSocket não deve impedir a criação do ticket
+      console.error(
+        "[Ticket Create] Erro ao emitir evento WebSocket (ignorado):",
+        error,
+      );
+    }
+
+    return { data: { success: true } };
   });
