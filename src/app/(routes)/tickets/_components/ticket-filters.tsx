@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { sectorsTable, ticketsTable } from "@/db/schema";
+import { useTicketsWebSocket } from "@/hooks/use-tickets-websocket";
 
 import { ticketsTableColumns } from "./table-columns";
 import TicketsCards from "./tickets-cards";
@@ -19,15 +20,49 @@ import TicketsCards from "./tickets-cards";
 type Ticket = typeof ticketsTable.$inferSelect;
 type Sector = typeof sectorsTable.$inferSelect;
 
+const fetchAllTickets = async () => {
+  const res = await fetch("/api/tickets", { credentials: "same-origin" });
+  if (!res.ok) {
+    if (res.status === 401) throw new Error("unauthorized");
+    throw new Error("Erro ao buscar tickets");
+  }
+  const data = await res.json();
+  return data.tickets || [];
+};
+
 export default function TicketFilters({
-  tickets,
+  tickets: initialTickets,
   sectors,
 }: {
   tickets: Ticket[];
   sectors: Sector[];
 }) {
+  const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
   const [nameFilter, setNameFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const loadTickets = useCallback(async () => {
+    try {
+      const fetchedTickets = await fetchAllTickets();
+      setTickets(fetchedTickets);
+    } catch (error) {
+      console.error("Erro ao carregar tickets:", error);
+    }
+  }, []);
+
+  // Conectar ao WebSocket para atualizações em tempo real
+  useTicketsWebSocket(loadTickets);
+
+  // Atualizar tickets quando os iniciais mudarem (SSR)
+  useEffect(() => {
+    setTickets(initialTickets);
+  }, [initialTickets]);
+
+  // Polling como fallback (60 segundos)
+  useEffect(() => {
+    const interval = setInterval(loadTickets, 60000);
+    return () => clearInterval(interval);
+  }, [loadTickets]);
 
   const filteredTickets = useMemo(() => {
     let filtered = tickets.filter((ticket) => {
